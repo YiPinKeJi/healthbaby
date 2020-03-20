@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.killerfox.hedm.healthbaby.mapper.ResourceMapper">
+
+    <!-- List<ResourceEntity> getResourceList(String account);-->
+    <select id="getResourceList" resultType="com.killerfox.hedm.healthbaby.entity.ResourceEntity">
+        SELECT r.id,r.name,r.path,r.duration,r.coverurl,IFNULL(u.finish,0) finish,IFNULL(u.progress,0) progress
+        FROM resource r
+        LEFT JOIN (SELECT * FROM `user_resource` WHERE account = #{account} ) u
+        ON r.id=u.`resource_id`;
+    </select>
+
+    <!-- List<UserNumber> getUserNumber()-->
+    <select id="getUserNumber" resultType="com.killerfox.hedm.healthbaby.entity.UserNumber">
+        select *
+        from user_number
+    </select>
+
+    <!-- boolean modUserNumber(@Param("id") Integer id, @Param("value") Integer value); -->
+    <update id="modUserNumber">
+        update user_number
+        set value = #{value}
+        where id=#{id}
+    </update>
+
+    <!-- boolean modProgress(ProgressEntity progress); -->
+    <update id="modProgress">
+        update user_resource
+        set finish=#{finish}, progress=#{progress}
+        where resource_id=#{resource_id} and account=#{account}
+    </update>
+
+    <!-- boolean addProgress(ProgressEntity progress); -->
+    <insert id="addProgress">
+        insert into user_resource(resource_id, account, finish, progress)
+        value(#{resource_id},#{account},#{finish},#{progress})
+    </insert>
+
+    <!-- ProgressEntity getProgress(@Param("account") String account, @Param("resource_id") Integer resource_id); -->
+    <select id="getProgress" resultType="com.killerfox.hedm.healthbaby.entity.ProgressEntity">
+        select *
+        from user_resource
+        where resource_id=#{resource_id} and account=#{account}
+    </select>
+
+</mapper>
+

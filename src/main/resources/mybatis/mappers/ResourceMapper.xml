@@ -10,7 +10,16 @@
         SELECT r.id,r.name,r.path,r.duration,r.coverurl,IFNULL(u.finish,0) finish,IFNULL(u.progress,0) progress
         FROM resource r
         LEFT JOIN (SELECT * FROM `user_resource` WHERE account = #{account} ) u
-        ON r.id=u.`resource_id`;
+        ON r.id=u.`resource_id`
+        <trim prefix="" prefixOverrides="and | or | (" suffix="" suffixOverrides=")">
+        WHERE
+        <if test="account == 'admin'">
+           r.type='all' or r.type='admin'
+        </if>
+        <if test="account != 'admin'">
+                r.type='all' or r.type='other'
+        </if>
+        </trim>
     </select>
 
     <!-- List<UserNumber> getUserNumber()-->
